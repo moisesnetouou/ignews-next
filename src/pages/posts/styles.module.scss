@@ -42,3 +42,12 @@
     }
   }
 }
+
+.pagination{
+  display: flex;
+  justify-content: space-between;
+  background: var(--gray-700);
+  margin-top: 5rem;
+  text-align: center;
+  align-items: center;
+}

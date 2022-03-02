@@ -1,27 +1,33 @@
-import { GetStaticProps } from 'next';
+import { GetStaticPaths, GetStaticProps } from 'next';
 import Head from 'next/head';
 import Prismic from '@prismicio/client';
 import {RichText} from 'prismic-dom';
 
-import {getPrismicClient} from '../../services/prismic';
-import styles from './styles.module.scss';
+import {getPrismicClient} from '../../../services/prismic';
+import styles from '../styles.module.scss';
 import Link from 'next/link';
 
 type Post = {
   slug: string;
   title: string;
   excerpt: string;
-  updatedAt: string;
-  
+  updatedAt: string; 
 }
 interface PostsProps {
   posts: Post[];
-  page: number ;
-  total_page: number ;
+  page: number;
+  total_page: number;
 }
 
-export default function Posts({posts,  page, total_page}: PostsProps){
+export const getStaticPaths: GetStaticPaths = async () => {
+  return {
+    paths: [],
+    fallback: 'blocking'
+  }
+}
 
+
+export default function Posts({posts, page, total_page}: PostsProps){
   return(
     <>
       <Head>
@@ -42,30 +48,63 @@ export default function Posts({posts,  page, total_page}: PostsProps){
         </div>
 
         <div className={styles.pagination}>
-          <Link href={`/posts/page/${page + 1}`}>
-            <a>Página {page} de {total_page}</a>
+          {page === 2 ? (
+            <Link href="/posts">
+            <a>voltar</a>
           </Link>
+          ): (
+            <Link href={`/posts/page/${page - 1}`}>
+            <a>voltar</a>
+          </Link>
+          )}
+
+      
+            <span>Página {page} de {total_page}</span>
+          
+
+          {page !== total_page &&
+            <Link href={`/posts/page/${page + 1}`}>
+              <a>Avançar</a>
+            </Link>
+          }
+
+          
         </div>
+
       </main>
     </>
   );
 }
 
 export const getStaticProps: GetStaticProps = async ({params}) => {
+
   const prismic = getPrismicClient();
-  console.log('TESTE DE PARAMETROS', params)
+
+  const {page} = params;
+
+  const pageNumber = Number(page);
+
+  console.log('TESTE DE PARAMETROS', pageNumber)
 
   const response = await prismic.query([
     Prismic.Predicates.at('document.type', 'publication')
   ], {
     fetch: ['publication.title', 'publication.content'],
     pageSize: 1,
+    page: pageNumber
   })
 
-
   // console.log(JSON.stringify(response, null, 2))
+  console.log('---> AQUI', response)
 
-  console.log('pagina final', response)
+  if(response.results_size === 0){
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false
+      }
+    }
+  }
 
   const posts  = response.results.map(post => {
     return {
@@ -82,7 +121,6 @@ export const getStaticProps: GetStaticProps = async ({params}) => {
     }
   })
 
-  
   return {
     props: {
       posts,

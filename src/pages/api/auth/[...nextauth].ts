@@ -39,7 +39,6 @@ export default NextAuth({
           ])
         )
       )
-      console.log('Faua', userActiveSubscription)
 
       return {
         ...session,

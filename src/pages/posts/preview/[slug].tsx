@@ -61,9 +61,6 @@ export default function PostPreview({post}: PostPreviewPros){
 export const getStaticProps : GetStaticProps = async ({ params }) => {
 
   const {slug} = params;
-  const par = params;
-  console.log('teste params', par);
-
 
   const prismic = getPrismicClient();
 
