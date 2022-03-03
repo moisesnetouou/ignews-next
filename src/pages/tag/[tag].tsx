@@ -3,8 +3,8 @@ import Head from 'next/head';
 import Prismic from '@prismicio/client';
 import {RichText} from 'prismic-dom';
 
-import {getPrismicClient} from '../../../services/prismic';
-import styles from '../styles.module.scss';
+import {getPrismicClient} from '../../services/prismic';
+import styles from '../posts/styles.module.scss';
 import Link from 'next/link';
 
 type Post = {
@@ -13,7 +13,7 @@ type Post = {
   excerpt: string;
   updatedAt: string; 
 }
-interface PostsProps {
+interface TagPostsProps {
   posts: Post[];
   page: number;
   total_page: number;
@@ -27,7 +27,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
 }
 
 
-export default function Posts({posts, page, total_page}: PostsProps){
+export default function TagPosts({posts, page, total_page}: TagPostsProps){
   return(
     <>
       <Head>
@@ -47,7 +47,7 @@ export default function Posts({posts, page, total_page}: PostsProps){
          ))}
         </div>
 
-        <div className={styles.pagination}>
+        {/* <div className={styles.pagination}>
           {page === 2 ? (
             <Link href="/posts">
             <a>voltar</a>
@@ -69,8 +69,7 @@ export default function Posts({posts, page, total_page}: PostsProps){
           }
 
           
-        </div>
-
+        </div> */}
       </main>
     </>
   );
@@ -80,22 +79,22 @@ export const getStaticProps: GetStaticProps = async ({params}) => {
 
   const prismic = getPrismicClient();
 
-  const {page} = params;
+  const {tag} = params;
+  const tagItem = tag.toString();
 
-  const pageNumber = Number(page);
+  // const pageNumber = Number(page);
 
-  console.log('TESTE DE PARAMETROS', pageNumber)
+  console.log('-->>TESTE DE PARAMETROS tag ', tag)
 
   const response = await prismic.query([
-    Prismic.Predicates.at('document.type', 'publication')
+    Prismic.Predicates.at('document.tags', [tagItem])
   ], {
     fetch: ['publication.title', 'publication.content'],
-    pageSize: 1,
-    page: pageNumber
+    pageSize: 10,
   })
 
   console.log(JSON.stringify(response, null, 2))
-  // console.log('---> AQUI', response)
+  console.log('---> AQUI', response)
 
   if(response.results_size === 0){
     return {
@@ -123,9 +122,9 @@ export const getStaticProps: GetStaticProps = async ({params}) => {
 
   return {
     props: {
-      posts,
-      page: response.page,
-      total_page: response.total_pages
+     posts,
+      // page: response.page,
+      // total_page: response.total_pages
     }
   }
 }

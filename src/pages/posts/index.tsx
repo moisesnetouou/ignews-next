@@ -6,6 +6,7 @@ import {RichText} from 'prismic-dom';
 import {getPrismicClient} from '../../services/prismic';
 import styles from './styles.module.scss';
 import Link from 'next/link';
+import { useState } from 'react';
 
 type Post = {
   slug: string;
@@ -44,6 +45,24 @@ export default function Posts({posts,  page, total_page}: PostsProps){
         <div className={styles.pagination}>
           <Link href={`/posts/page/${page + 1}`}>
             <a>Página {page} de {total_page}</a>
+          </Link>
+        </div>
+
+        <div className={styles.pagination}>
+          <Link href={`/tag/${'elixir'}`}>
+            <a>Tag Elixie</a>
+          </Link>
+        </div>
+
+        <div className={styles.pagination}>
+          <Link href={`/tag/${'jamstack'}`}>
+            <a>Tag jamstack</a>
+          </Link>
+        </div>
+
+        <div className={styles.pagination}>
+          <Link href={`/tag/${'programacao'}`}>
+            <a>Tag programacao</a>
           </Link>
         </div>
       </main>
@@ -87,7 +106,7 @@ export const getStaticProps: GetStaticProps = async ({params}) => {
     props: {
       posts,
       page: response.page,
-      total_page: response.total_pages
+      total_page: response.total_pages,
     }
   }
 }
